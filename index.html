@@ -1,0 +1,1122 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>เกมตาชั่งสมดุลแห่งลำไส้</title>
+<link href="https://fonts.googleapis.com/css2?family=Mitr:wght@400;500;600;700&family=Bai+Jamjuree:wght@600;700&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+  
+  :root {
+    --bg-cream: #FDF6E3;
+    --mint: #B8E0D2;
+    --mint-light: #D4ECE1;
+    --mint-border: #2C5F63;
+    --beam: #F4C77A;
+    --beam-deep: #E8A94A;
+    --beam-border: #B8823C;
+    --stand: #C8DDD4;
+    --stand-deep: #7FA99B;
+    --text-dark: #2C3E50;
+    --text-navy: #1D3557;
+    --wrong: #E76F51;
+    --correct: #52B788;
+  }
+  
+  html, body {
+    height: 100%;
+    overflow: hidden;
+    overscroll-behavior: none;
+    touch-action: manipulation;
+  }
+  
+  body {
+    font-family: 'Mitr', sans-serif;
+    background: var(--bg-cream);
+    color: var(--text-dark);
+    position: relative;
+  }
+  
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: radial-gradient(circle, rgba(184, 224, 210, 0.12) 1px, transparent 1px);
+    background-size: 20px 20px;
+    pointer-events: none;
+    z-index: 0;
+  }
+  
+  .screen {
+    position: fixed;
+    inset: 0;
+    display: none;
+    flex-direction: column;
+    z-index: 1;
+    padding: 14px;
+  }
+  
+  .screen.active { display: flex; }
+  
+  /* ===== START SCREEN ===== */
+  #start-screen {
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    padding: 24px;
+  }
+  
+  .logo-wrap {
+    margin-bottom: 16px;
+    animation: float 3s ease-in-out infinite;
+  }
+  
+  @keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-6px); }
+  }
+  
+  .title {
+    font-family: 'Bai Jamjuree', sans-serif;
+    font-size: 26px;
+    font-weight: 700;
+    color: var(--text-navy);
+    line-height: 1.2;
+    margin-bottom: 6px;
+  }
+  
+  .title .accent {
+    color: var(--mint-border);
+    display: block;
+    font-size: 32px;
+    margin-top: 4px;
+  }
+  
+  .subtitle {
+    font-size: 14px;
+    color: var(--text-dark);
+    margin-bottom: 24px;
+    line-height: 1.6;
+    max-width: 320px;
+    opacity: 0.8;
+  }
+  
+  .btn {
+    font-family: 'Mitr', sans-serif;
+    font-weight: 600;
+    font-size: 17px;
+    padding: 14px 36px;
+    border: 3px solid var(--mint-border);
+    border-radius: 14px;
+    cursor: pointer;
+    transition: all 0.15s;
+    box-shadow: 0 5px 0 var(--mint-border);
+  }
+  
+  .btn-primary {
+    background: var(--mint);
+    color: var(--text-navy);
+  }
+  
+  .btn-primary:active {
+    transform: translateY(4px);
+    box-shadow: 0 1px 0 var(--mint-border);
+  }
+  
+  .btn-secondary {
+    background: white;
+    color: var(--mint-border);
+    font-size: 14px;
+    padding: 10px 24px;
+    box-shadow: 0 4px 0 var(--mint-border);
+  }
+  
+  .btn-secondary:active {
+    transform: translateY(3px);
+    box-shadow: 0 1px 0 var(--mint-border);
+  }
+  
+  .how-to {
+    background: white;
+    border: 2.5px solid var(--mint-border);
+    border-radius: 16px;
+    padding: 14px 18px;
+    margin-top: 18px;
+    max-width: 340px;
+    text-align: left;
+    box-shadow: 0 3px 0 rgba(44, 95, 99, 0.15);
+  }
+  
+  .how-to h3 {
+    font-family: 'Bai Jamjuree', sans-serif;
+    font-size: 15px;
+    color: var(--mint-border);
+    margin-bottom: 6px;
+    text-align: center;
+  }
+  
+  .how-to p {
+    font-size: 12.5px;
+    color: var(--text-dark);
+    line-height: 1.7;
+  }
+  
+  /* ===== GAME SCREEN ===== */
+  #game-screen {
+    display: none;
+    flex-direction: column;
+    height: 100vh;
+    height: 100dvh;
+    padding: 10px;
+  }
+  
+  #game-screen.active { display: flex; }
+  
+  .game-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 14px;
+    background: white;
+    border: 2.5px solid var(--mint-border);
+    border-radius: 14px;
+    flex-shrink: 0;
+    box-shadow: 0 3px 0 rgba(44, 95, 99, 0.15);
+  }
+  
+  .header-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+  }
+  
+  .header-label {
+    font-size: 10px;
+    color: var(--text-dark);
+    opacity: 0.65;
+  }
+  
+  .header-value {
+    font-family: 'Bai Jamjuree', sans-serif;
+    font-size: 17px;
+    font-weight: 700;
+    color: var(--mint-border);
+    line-height: 1;
+  }
+  
+  .instruction {
+    text-align: center;
+    font-size: 12.5px;
+    color: var(--text-dark);
+    margin: 8px 0 4px;
+    opacity: 0.85;
+    flex-shrink: 0;
+  }
+  
+  .instruction strong {
+    color: var(--mint-border);
+  }
+  
+  /* ===== CHOICES - All same color, no hint ===== */
+  .choices-container {
+    margin: 6px 0 4px;
+    flex-shrink: 0;
+    border: 2.5px solid var(--mint-border);
+    border-radius: 14px;
+    padding: 10px 10px 12px;
+    background: white;
+    box-shadow: 0 3px 0 rgba(44, 95, 99, 0.12);
+  }
+  
+  .box-label {
+    font-size: 11.5px;
+    text-align: center;
+    color: var(--mint-border);
+    margin-bottom: 8px;
+    font-weight: 500;
+  }
+  
+  .choices-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 6px;
+  }
+  
+  .choice-card {
+    background: var(--mint);
+    border: 2px solid var(--mint-border);
+    border-radius: 10px;
+    padding: 8px 3px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.15s;
+    user-select: none;
+    min-height: 68px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 3px;
+    position: relative;
+  }
+  
+  .choice-card:active {
+    transform: scale(0.95);
+  }
+  
+  .choice-card.selected {
+    transform: translateY(-3px) scale(1.05);
+    box-shadow: 0 6px 0 var(--mint-border), 0 0 0 3px rgba(184, 224, 210, 0.6);
+    z-index: 5;
+    background: var(--mint-light);
+  }
+  
+  .choice-card.used {
+    opacity: 0.25;
+    pointer-events: none;
+    filter: grayscale(0.5);
+  }
+  
+  .choice-icon {
+    font-size: 22px;
+    line-height: 1;
+  }
+  
+  .choice-text {
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--text-navy);
+    line-height: 1.15;
+  }
+  
+  /* ===== SCALE ===== */
+  .scale-section {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    min-height: 0;
+    padding: 10px 0 0;
+  }
+  
+  .scale-wrap {
+    position: relative;
+    width: 100%;
+    max-width: 400px;
+    height: 100%;
+    max-height: 280px;
+    display: flex;
+    justify-content: center;
+    align-items: flex-end;
+  }
+  
+  .scale-svg-container {
+    position: relative;
+    width: 100%;
+    height: 100%;
+  }
+  
+  .behavior-label {
+    position: absolute;
+    left: 2px;
+    bottom: 50px;
+    font-size: 11px;
+    color: var(--text-dark);
+    opacity: 0.6;
+    z-index: 5;
+  }
+  
+  .beam-group {
+    position: absolute;
+    bottom: 45px;
+    left: 50%;
+    transform: translateX(-50%) rotate(0deg);
+    width: 340px;
+    max-width: 92%;
+    height: 70px;
+    transform-origin: center bottom;
+    transition: transform 0.8s cubic-bezier(0.68, -0.3, 0.3, 1.4);
+  }
+  
+  .beam-group.tilt-left { transform: translateX(-50%) rotate(-12deg); }
+  .beam-group.tilt-right { transform: translateX(-50%) rotate(12deg); }
+  .beam-group.tilt-slight-left { transform: translateX(-50%) rotate(-5deg); }
+  .beam-group.tilt-slight-right { transform: translateX(-50%) rotate(5deg); }
+  .beam-group.wobble { animation: wobble 0.6s ease-in-out; }
+  
+  @keyframes wobble {
+    0%, 100% { transform: translateX(-50%) rotate(0deg); }
+    25% { transform: translateX(-50%) rotate(-4deg); }
+    75% { transform: translateX(-50%) rotate(4deg); }
+  }
+  
+  .beam-plank {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 24px;
+    background: linear-gradient(180deg, var(--beam) 0%, var(--beam-deep) 100%);
+    border: 2.5px solid var(--beam-border);
+    border-radius: 4px;
+  }
+  
+  .drop-slots {
+    position: absolute;
+    bottom: 22px;
+    left: 0;
+    width: 100%;
+    display: flex;
+    justify-content: space-around;
+    padding: 0 18px;
+  }
+  
+  .drop-slot {
+    width: 54px;
+    height: 26px;
+    background: var(--mint);
+    border: 2.5px solid var(--mint-border);
+    border-bottom: none;
+    border-radius: 6px 6px 0 0;
+    position: relative;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  
+  .drop-slot.hint {
+    background: #8FD19E;
+    animation: slot-pulse 0.8s ease-in-out infinite;
+  }
+  
+  @keyframes slot-pulse {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-4px); }
+  }
+  
+  .slot-item {
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    background: white;
+    border: 2px solid var(--mint-border);
+    border-radius: 8px;
+    padding: 4px 3px;
+    width: 58px;
+    text-align: center;
+    font-size: 9px;
+    font-weight: 500;
+    color: var(--text-navy);
+    animation: drop-in 0.5s cubic-bezier(0.5, -0.3, 0.3, 1.4);
+    box-shadow: 0 -2px 4px rgba(0,0,0,0.08);
+    line-height: 1.15;
+    z-index: 2;
+    margin-bottom: 2px;
+  }
+  
+  .slot-item .item-icon {
+    font-size: 16px;
+    display: block;
+    line-height: 1;
+    margin-bottom: 1px;
+  }
+  
+  .slot-item.reveal-correct {
+    border-color: var(--correct);
+    background: #E8F5E9;
+    animation: drop-in 0.5s cubic-bezier(0.5, -0.3, 0.3, 1.4), reveal-pulse 0.5s ease 0.3s;
+  }
+  
+  .slot-item.reveal-wrong {
+    border-color: var(--wrong);
+    background: #FFEBE8;
+    animation: drop-in 0.5s cubic-bezier(0.5, -0.3, 0.3, 1.4), reveal-pulse 0.5s ease 0.3s;
+  }
+  
+  @keyframes reveal-pulse {
+    0% { transform: translateX(-50%) scale(1); }
+    50% { transform: translateX(-50%) scale(1.15); }
+    100% { transform: translateX(-50%) scale(1); }
+  }
+  
+  @keyframes drop-in {
+    0% { transform: translate(-50%, -40px) scale(0.5); opacity: 0; }
+    60% { transform: translate(-50%, 4px) scale(1.1); opacity: 1; }
+    100% { transform: translate(-50%, 0) scale(1); opacity: 1; }
+  }
+  
+  .scale-stand {
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 0;
+    height: 0;
+    border-left: 55px solid transparent;
+    border-right: 55px solid transparent;
+    border-bottom: 80px solid var(--stand);
+    z-index: -1;
+  }
+  
+  .scale-stand::before {
+    content: '';
+    position: absolute;
+    top: 15px;
+    left: -38px;
+    width: 0;
+    height: 0;
+    border-left: 38px solid transparent;
+    border-right: 38px solid transparent;
+    border-bottom: 55px solid var(--stand-deep);
+    opacity: 0.35;
+  }
+  
+  .scale-base {
+    position: absolute;
+    bottom: -6px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 140px;
+    height: 8px;
+    background: var(--stand-deep);
+    border-radius: 4px;
+    z-index: -2;
+  }
+  
+  .balance-status {
+    position: absolute;
+    top: 4px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: white;
+    border: 2.5px solid var(--mint-border);
+    border-radius: 20px;
+    padding: 5px 16px;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--mint-border);
+    opacity: 0;
+    transition: opacity 0.3s;
+    z-index: 10;
+    white-space: nowrap;
+    box-shadow: 0 2px 0 var(--mint-border);
+  }
+  
+  .balance-status.show { opacity: 1; }
+  .balance-status.unbalanced {
+    border-color: var(--wrong);
+    color: var(--wrong);
+    box-shadow: 0 2px 0 var(--wrong);
+  }
+  .balance-status.perfect {
+    border-color: var(--correct);
+    color: var(--correct);
+    box-shadow: 0 2px 0 var(--correct);
+  }
+  
+  /* ===== RESULT SCREEN ===== */
+  #result-screen {
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    padding: 24px;
+  }
+  
+  .result-card {
+    background: white;
+    border: 3px solid var(--mint-border);
+    border-radius: 24px;
+    padding: 28px 22px;
+    max-width: 360px;
+    width: 100%;
+    box-shadow: 0 6px 0 var(--mint-border);
+    animation: result-pop 0.5s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+  }
+  
+  @keyframes result-pop {
+    0% { transform: scale(0.7); opacity: 0; }
+    100% { transform: scale(1); opacity: 1; }
+  }
+  
+  .result-emoji {
+    font-size: 64px;
+    margin-bottom: 10px;
+    display: block;
+    animation: bounce 1s ease-in-out infinite;
+  }
+  
+  @keyframes bounce {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-8px); }
+  }
+  
+  .result-title {
+    font-family: 'Bai Jamjuree', sans-serif;
+    font-size: 26px;
+    font-weight: 700;
+    color: var(--mint-border);
+    margin-bottom: 8px;
+  }
+  
+  .result-score {
+    font-size: 15px;
+    color: var(--text-dark);
+    opacity: 0.8;
+    margin-bottom: 14px;
+  }
+  
+  .result-score strong {
+    font-family: 'Bai Jamjuree', sans-serif;
+    font-size: 30px;
+    color: var(--correct);
+    display: block;
+    margin-top: 2px;
+  }
+  
+  .result-tip {
+    background: var(--mint-light);
+    border: 2px solid var(--mint-border);
+    padding: 12px 14px;
+    border-radius: 12px;
+    font-size: 12.5px;
+    line-height: 1.6;
+    color: var(--text-dark);
+    margin-bottom: 18px;
+    text-align: left;
+  }
+  
+  .result-tip-title {
+    font-weight: 700;
+    color: var(--mint-border);
+    margin-bottom: 4px;
+    display: block;
+    font-size: 13px;
+  }
+  
+  .result-buttons {
+    display: flex;
+    gap: 10px;
+    flex-direction: column;
+  }
+  
+  .feedback {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(0);
+    background: white;
+    padding: 16px 28px;
+    border-radius: 16px;
+    border: 3px solid var(--mint-border);
+    font-family: 'Bai Jamjuree', sans-serif;
+    font-size: 20px;
+    font-weight: 700;
+    z-index: 100;
+    pointer-events: none;
+    opacity: 0;
+    transition: all 0.3s;
+    box-shadow: 0 4px 0 var(--mint-border);
+    white-space: nowrap;
+  }
+  
+  .feedback.show {
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 1;
+  }
+  
+  .feedback.correct {
+    color: var(--correct);
+    border-color: var(--correct);
+    box-shadow: 0 4px 0 var(--correct);
+  }
+  
+  .feedback.wrong {
+    color: var(--wrong);
+    border-color: var(--wrong);
+    box-shadow: 0 4px 0 var(--wrong);
+  }
+  
+  .confetti {
+    position: fixed;
+    width: 10px;
+    height: 10px;
+    pointer-events: none;
+    z-index: 200;
+    animation: confetti-fall 2.2s linear forwards;
+  }
+  
+  @keyframes confetti-fall {
+    0% { transform: translateY(-100vh) rotate(0deg); opacity: 1; }
+    100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
+  }
+  
+  @media (max-height: 720px) {
+    .choice-card { min-height: 60px; padding: 6px 3px; }
+    .choice-icon { font-size: 20px; }
+    .choice-text { font-size: 10.5px; }
+    .beam-group { height: 64px; }
+    .drop-slot { width: 48px; height: 24px; }
+    .slot-item { width: 52px; font-size: 8.5px; }
+    .slot-item .item-icon { font-size: 14px; }
+  }
+  
+  @media (max-height: 620px) {
+    .title { font-size: 22px; }
+    .title .accent { font-size: 26px; }
+    .subtitle { font-size: 13px; margin-bottom: 16px; }
+    .choice-card { min-height: 54px; }
+    .choice-icon { font-size: 18px; }
+    .scale-wrap { max-height: 200px; }
+    .scale-stand { border-left-width: 44px; border-right-width: 44px; border-bottom-width: 60px; }
+  }
+  
+  @media (max-width: 360px) {
+    .choice-text { font-size: 9.5px; }
+    .choice-icon { font-size: 18px; }
+    .drop-slot { width: 44px; }
+    .slot-item { width: 48px; font-size: 8px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- START SCREEN -->
+<div id="start-screen" class="screen active">
+  <div class="logo-wrap">
+    <svg width="180" height="130" viewBox="0 0 180 130" xmlns="http://www.w3.org/2000/svg">
+      <polygon points="90,105 50,35 130,35" fill="#C8DDD4" stroke="#2C5F63" stroke-width="2.5"/>
+      <rect x="30" y="103" width="120" height="8" rx="4" fill="#7FA99B"/>
+      <g transform="rotate(-6 90 60)">
+        <rect x="10" y="55" width="160" height="16" rx="3" fill="#F4C77A" stroke="#B8823C" stroke-width="2.5"/>
+        <rect x="22" y="42" width="24" height="14" rx="2" fill="#B8E0D2" stroke="#2C5F63" stroke-width="2"/>
+        <rect x="58" y="42" width="24" height="14" rx="2" fill="#B8E0D2" stroke="#2C5F63" stroke-width="2"/>
+        <rect x="98" y="42" width="24" height="14" rx="2" fill="#B8E0D2" stroke="#2C5F63" stroke-width="2"/>
+        <rect x="134" y="42" width="24" height="14" rx="2" fill="#B8E0D2" stroke="#2C5F63" stroke-width="2"/>
+        <text x="34" y="35" font-size="14" text-anchor="middle">🥬</text>
+        <text x="70" y="35" font-size="14" text-anchor="middle">💧</text>
+        <text x="110" y="35" font-size="14" text-anchor="middle">🦠</text>
+        <text x="146" y="35" font-size="14" text-anchor="middle">🏃</text>
+      </g>
+      <text x="90" y="20" font-size="18" text-anchor="middle">✨</text>
+    </svg>
+  </div>
+  
+  <h1 class="title">
+    เกมตาชั่ง
+    <span class="accent">สมดุลแห่งลำไส้</span>
+  </h1>
+  <p class="subtitle">ลำไส้เราชอบอะไรนะ?<br>เลือก 4 อย่างที่ถูก วางบนตาชั่งให้สมดุล</p>
+  
+  <button class="btn btn-primary" onclick="startGame()">เริ่มเล่น 🎮</button>
+  
+  <div class="how-to">
+    <h3>🎯 วิธีเล่น</h3>
+    <p>1) แตะเลือกตัวเลือก (มี 7 อย่าง)<br>
+    2) แตะช่องบนตาชั่ง<br>
+    3) วาง<strong style="color:var(--correct)">ของถูก</strong>ครบ 4 = สมดุล ⚖️<br>
+    4) วาง<strong style="color:var(--wrong)">ของผิด</strong> = ตาชั่งเอียง!</p>
+  </div>
+</div>
+
+<!-- GAME SCREEN -->
+<div id="game-screen" class="screen">
+  <div class="game-header">
+    <div class="header-item">
+      <span class="header-label">คะแนน</span>
+      <span class="header-value" id="score">0</span>
+    </div>
+    <div class="header-item">
+      <span class="header-label">วางแล้ว</span>
+      <span class="header-value"><span id="placed-count">0</span>/4</span>
+    </div>
+    <div class="header-item">
+      <span class="header-label">❤️ ชีวิต</span>
+      <span class="header-value" id="lives">3</span>
+    </div>
+  </div>
+  
+  <p class="instruction">แตะเลือก <strong>→</strong> แตะช่องบนตาชั่ง</p>
+  
+  <div class="choices-container">
+    <div class="box-label">🤔 ลำไส้เราชอบอะไรนะ? เลือกให้ถูก!</div>
+    <div class="choices-grid" id="choices"></div>
+  </div>
+  
+  <div class="scale-section">
+    <div class="scale-wrap">
+      <div class="behavior-label">พฤติกรรม</div>
+      <div class="scale-svg-container">
+        <div class="balance-status" id="balance-status">⚖️ สมดุล</div>
+        
+        <div class="beam-group" id="beam-group">
+          <div class="drop-slots">
+            <div class="drop-slot" data-slot="0"></div>
+            <div class="drop-slot" data-slot="1"></div>
+            <div class="drop-slot" data-slot="2"></div>
+            <div class="drop-slot" data-slot="3"></div>
+          </div>
+          <div class="beam-plank"></div>
+        </div>
+        
+        <div class="scale-stand"></div>
+        <div class="scale-base"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- RESULT SCREEN -->
+<div id="result-screen" class="screen">
+  <div class="result-card">
+    <span class="result-emoji" id="result-emoji">🎉</span>
+    <h2 class="result-title" id="result-title">สุดยอด!</h2>
+    <p class="result-score">
+      คะแนนของคุณ
+      <strong id="final-score">0</strong>
+    </p>
+    <div class="result-tip">
+      <span class="result-tip-title">💡 รู้ไว้ใช่ว่า</span>
+      <span id="result-tip-text"></span>
+    </div>
+    <div class="result-buttons">
+      <button class="btn btn-primary" onclick="restartGame()">เล่นอีกครั้ง 🔄</button>
+      <button class="btn btn-secondary" onclick="goHome()">กลับหน้าหลัก</button>
+    </div>
+  </div>
+</div>
+
+<div class="feedback" id="feedback"></div>
+
+<script>
+  // All items look the SAME — no color hint between correct/wrong
+  const ALL_ITEMS = [
+    { id: 'fiber', text: 'มวล (กากใย)', icon: '🥬', correct: true },
+    { id: 'water', text: 'น้ำ', icon: '💧', correct: true },
+    { id: 'probio', text: 'พรีไบโอติก', icon: '🦠', correct: true },
+    { id: 'move', text: 'การเคลื่อนไหว', icon: '🏃', correct: true },
+    { id: 'detox', text: 'Detox', icon: '🧃', correct: false },
+    { id: 'coffee', text: 'กาแฟ', icon: '☕', correct: false },
+    { id: 'sit', text: 'นั่งห้องน้ำนาน', icon: '🚽', correct: false }
+  ];
+  
+  let state = {
+    score: 0,
+    lives: 3,
+    placedCount: 0,
+    selectedChoice: null,
+    usedIds: new Set(),
+    slotContents: [null, null, null, null],
+    wrongPlaced: 0,
+    correctPlaced: 0
+  };
+  
+  function showScreen(id) {
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+  }
+  
+  function startGame() {
+    state = {
+      score: 0,
+      lives: 3,
+      placedCount: 0,
+      selectedChoice: null,
+      usedIds: new Set(),
+      slotContents: [null, null, null, null],
+      wrongPlaced: 0,
+      correctPlaced: 0
+    };
+    renderChoices();
+    clearSlots();
+    resetBeam();
+    updateHUD();
+    showScreen('game-screen');
+  }
+  
+  function restartGame() { startGame(); }
+  function goHome() { showScreen('start-screen'); }
+  
+  function updateHUD() {
+    document.getElementById('score').textContent = state.score;
+    document.getElementById('placed-count').textContent = state.placedCount;
+    document.getElementById('lives').textContent = state.lives;
+  }
+  
+  function renderChoices() {
+    const container = document.getElementById('choices');
+    container.innerHTML = '';
+    
+    // Shuffle ALL 7 items together - mix correct + wrong, SAME visual style
+    const shuffled = [...ALL_ITEMS].sort(() => Math.random() - 0.5);
+    
+    shuffled.forEach(item => {
+      const card = document.createElement('div');
+      card.className = 'choice-card'; // All same class — no visual clue
+      card.dataset.id = item.id;
+      card.innerHTML = `
+        <span class="choice-icon">${item.icon}</span>
+        <div class="choice-text">${item.text}</div>
+      `;
+      card.addEventListener('click', () => selectChoice(item, card));
+      container.appendChild(card);
+    });
+  }
+  
+  function selectChoice(item, card) {
+    if (state.usedIds.has(item.id)) return;
+    
+    document.querySelectorAll('.choice-card').forEach(c => c.classList.remove('selected'));
+    
+    if (state.selectedChoice && state.selectedChoice.id === item.id) {
+      state.selectedChoice = null;
+      clearSlotHints();
+    } else {
+      state.selectedChoice = item;
+      card.classList.add('selected');
+      showSlotHints();
+    }
+  }
+  
+  function showSlotHints() {
+    document.querySelectorAll('.drop-slot').forEach((slot, idx) => {
+      if (!state.slotContents[idx]) {
+        slot.classList.add('hint');
+      }
+    });
+  }
+  
+  function clearSlotHints() {
+    document.querySelectorAll('.drop-slot').forEach(s => s.classList.remove('hint'));
+  }
+  
+  function clearSlots() {
+    document.querySelectorAll('.drop-slot').forEach(s => {
+      s.innerHTML = '';
+      s.classList.remove('hint');
+    });
+  }
+  
+  function resetBeam() {
+    const beam = document.getElementById('beam-group');
+    beam.className = 'beam-group';
+    document.getElementById('balance-status').classList.remove('show', 'unbalanced', 'perfect');
+  }
+  
+  document.querySelectorAll('.drop-slot').forEach(slot => {
+    slot.addEventListener('click', () => {
+      if (!state.selectedChoice) {
+        flashFeedback('เลือกของก่อนนะ 👆', 'wrong');
+        return;
+      }
+      const slotIdx = parseInt(slot.dataset.slot);
+      if (state.slotContents[slotIdx]) {
+        flashFeedback('ช่องนี้มีของแล้ว', 'wrong');
+        return;
+      }
+      placeInSlot(slot, slotIdx);
+    });
+  });
+  
+  function placeInSlot(slot, slotIdx) {
+    const item = state.selectedChoice;
+    
+    const itemEl = document.createElement('div');
+    itemEl.className = 'slot-item';
+    itemEl.innerHTML = `<span class="item-icon">${item.icon}</span>${item.text}`;
+    slot.appendChild(itemEl);
+    
+    // Reveal color after slight delay for suspense
+    setTimeout(() => {
+      itemEl.classList.add(item.correct ? 'reveal-correct' : 'reveal-wrong');
+    }, 400);
+    
+    state.slotContents[slotIdx] = { ...item };
+    state.usedIds.add(item.id);
+    state.placedCount++;
+    state.selectedChoice = null;
+    
+    const card = document.querySelector(`.choice-card[data-id="${item.id}"]`);
+    if (card) {
+      card.classList.remove('selected');
+      card.classList.add('used');
+    }
+    clearSlotHints();
+    
+    if (item.correct) {
+      state.correctPlaced++;
+      state.score += 25;
+      setTimeout(() => { flashFeedback('ถูกต้อง! +25', 'correct'); playCorrect(); }, 450);
+    } else {
+      state.wrongPlaced++;
+      state.lives--;
+      state.score = Math.max(0, state.score - 10);
+      setTimeout(() => { flashFeedback('ผิด! -10', 'wrong'); playWrong(); }, 450);
+    }
+    
+    updateHUD();
+    setTimeout(() => updateBalance(), 500);
+    
+    setTimeout(() => {
+      if (state.lives <= 0) {
+        endGame('lose');
+      } else if (state.placedCount >= 4) {
+        endGame(state.wrongPlaced === 0 ? 'perfect' : 'partial');
+      }
+    }, 1400);
+  }
+  
+  function updateBalance() {
+    const beam = document.getElementById('beam-group');
+    const status = document.getElementById('balance-status');
+    beam.className = 'beam-group';
+    status.classList.remove('show', 'unbalanced', 'perfect');
+    
+    let leftWeight = 0, rightWeight = 0;
+    let anyWrong = false;
+    
+    state.slotContents.forEach((item, idx) => {
+      if (!item) return;
+      const weight = item.correct ? 1 : 2.5;
+      if (!item.correct) anyWrong = true;
+      if (idx < 2) leftWeight += weight;
+      else rightWeight += weight;
+    });
+    
+    const diff = rightWeight - leftWeight;
+    
+    if (anyWrong) {
+      beam.classList.add('wobble');
+      setTimeout(() => {
+        beam.className = 'beam-group';
+        if (Math.abs(diff) < 0.3) {
+          beam.classList.add(leftWeight > 0 ? 'tilt-slight-left' : 'tilt-slight-right');
+        } else if (diff > 2) {
+          beam.classList.add('tilt-right');
+        } else if (diff > 0) {
+          beam.classList.add('tilt-slight-right');
+        } else if (diff < -2) {
+          beam.classList.add('tilt-left');
+        } else {
+          beam.classList.add('tilt-slight-left');
+        }
+      }, 600);
+      status.textContent = '⚠️ ไม่สมดุล';
+      status.classList.add('show', 'unbalanced');
+    } else {
+      if (Math.abs(diff) < 0.3) {
+        if (state.placedCount === 4) {
+          status.textContent = '⚖️ สมดุลสมบูรณ์!';
+          status.classList.add('show', 'perfect');
+        } else {
+          status.textContent = '⚖️ สมดุล';
+          status.classList.add('show');
+        }
+      } else if (diff > 0) {
+        beam.classList.add('tilt-slight-right');
+      } else {
+        beam.classList.add('tilt-slight-left');
+      }
+    }
+  }
+  
+  function flashFeedback(text, type) {
+    const fb = document.getElementById('feedback');
+    fb.textContent = text;
+    fb.className = `feedback ${type} show`;
+    setTimeout(() => fb.classList.remove('show'), 800);
+  }
+  
+  function playCorrect() {
+    try {
+      const ctx = new (window.AudioContext || window.webkitAudioContext)();
+      const o = ctx.createOscillator();
+      const g = ctx.createGain();
+      o.connect(g); g.connect(ctx.destination);
+      o.frequency.setValueAtTime(523, ctx.currentTime);
+      o.frequency.setValueAtTime(659, ctx.currentTime + 0.1);
+      o.frequency.setValueAtTime(784, ctx.currentTime + 0.2);
+      g.gain.setValueAtTime(0.1, ctx.currentTime);
+      g.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.3);
+      o.start(); o.stop(ctx.currentTime + 0.3);
+    } catch(e) {}
+  }
+  
+  function playWrong() {
+    try {
+      const ctx = new (window.AudioContext || window.webkitAudioContext)();
+      const o = ctx.createOscillator();
+      const g = ctx.createGain();
+      o.connect(g); g.connect(ctx.destination);
+      o.type = 'sawtooth';
+      o.frequency.setValueAtTime(200, ctx.currentTime);
+      o.frequency.exponentialRampToValueAtTime(80, ctx.currentTime + 0.3);
+      g.gain.setValueAtTime(0.08, ctx.currentTime);
+      g.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.3);
+      o.start(); o.stop(ctx.currentTime + 0.3);
+    } catch(e) {}
+  }
+  
+  function confetti() {
+    const colors = ['#B8E0D2', '#F4C77A', '#E8A94A', '#52B788', '#6FB3B8'];
+    for (let i = 0; i < 50; i++) {
+      const c = document.createElement('div');
+      c.className = 'confetti';
+      c.style.left = Math.random() * 100 + '%';
+      c.style.background = colors[Math.floor(Math.random() * colors.length)];
+      c.style.animationDelay = Math.random() * 0.6 + 's';
+      c.style.animationDuration = (1.8 + Math.random()) + 's';
+      if (Math.random() > 0.5) c.style.borderRadius = '50%';
+      document.body.appendChild(c);
+      setTimeout(() => c.remove(), 2800);
+    }
+  }
+  
+  function endGame(result) {
+    const emoji = document.getElementById('result-emoji');
+    const title = document.getElementById('result-title');
+    const tipText = document.getElementById('result-tip-text');
+    
+    if (result === 'perfect') {
+      emoji.textContent = '🏆';
+      title.textContent = 'สมดุลสมบูรณ์!';
+      title.style.color = 'var(--correct)';
+      tipText.innerHTML = 'ยอดเยี่ยม! คุณเลือกถูกทั้ง 4 อย่าง ⚖️<br><br>' +
+        '<b>สูตรลำไส้สมดุล:</b><br>🥬 กากใย + 💧 น้ำ + 🦠 พรีไบโอติก + 🏃 เคลื่อนไหว<br>= ขับถ่ายดีทุกวัน 💚';
+      confetti();
+    } else if (result === 'lose') {
+      emoji.textContent = '😢';
+      title.textContent = 'ตาชั่งล้ม!';
+      title.style.color = 'var(--wrong)';
+      tipText.innerHTML = '<b>ลำไส้ไม่ชอบสิ่งเหล่านี้:</b><br>🧃 Detox · ☕ กาแฟเยอะ · 🚽 นั่งนาน<br><br>' +
+        '<b>ลองใหม่! เลือก:</b><br>🥬 กากใย · 💧 น้ำ · 🦠 พรีไบโอติก · 🏃 เคลื่อนไหว';
+    } else {
+      emoji.textContent = '🤔';
+      title.textContent = 'เกือบแล้ว!';
+      title.style.color = 'var(--beam-deep)';
+      tipText.innerHTML = '<b>สิ่งที่ลำไส้ชอบจริงๆ:</b><br>' +
+        '✅ กากใย · น้ำ · พรีไบโอติก · การเคลื่อนไหว<br><br>' +
+        '<b>สิ่งที่ควรหลีกเลี่ยง:</b><br>' +
+        '❌ Detox · กาแฟเยอะ · นั่งห้องน้ำนาน';
+    }
+    
+    document.getElementById('final-score').textContent = state.score;
+    showScreen('result-screen');
+  }
+  
+  document.addEventListener('touchmove', e => {
+    if (e.touches.length > 1) e.preventDefault();
+  }, { passive: false });
+  
+  let lastTouch = 0;
+  document.addEventListener('touchend', e => {
+    const now = Date.now();
+    if (now - lastTouch < 300) e.preventDefault();
+    lastTouch = now;
+  }, { passive: false });
+</script>
+</body>
+</html>
