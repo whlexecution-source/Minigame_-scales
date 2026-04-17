@@ -796,7 +796,7 @@
   const ALL_ITEMS = [
     { id: 'fiber', text: 'มวล (กากใย)', icon: '🥬', correct: true },
     { id: 'water', text: 'น้ำ', icon: '💧', correct: true },
-    { id: 'probio', text: 'พรีไบโอติก', icon: '🦠', correct: true },
+    { id: 'probio', text: 'โพรไบโอติก', icon: '🦠', correct: true },
     { id: 'move', text: 'การเคลื่อนไหว', icon: '🏃', correct: true },
     { id: 'detox', text: 'Detox', icon: '🧃', correct: false },
     { id: 'coffee', text: 'กาแฟ', icon: '☕', correct: false },
@@ -1085,20 +1085,20 @@
       title.textContent = 'สมดุลสมบูรณ์!';
       title.style.color = 'var(--correct)';
       tipText.innerHTML = 'ยอดเยี่ยม! คุณเลือกถูกทั้ง 4 อย่าง ⚖️<br><br>' +
-        '<b>สูตรลำไส้สมดุล:</b><br>🥬 กากใย + 💧 น้ำ + 🦠 พรีไบโอติก + 🏃 เคลื่อนไหว<br>= ขับถ่ายดีทุกวัน 💚';
+        '<b>สูตรลำไส้สมดุล:</b><br>🥬 กากใย + 💧 น้ำ + 🦠 โพรไบโอติก + 🏃 เคลื่อนไหว<br>= ขับถ่ายดีทุกวัน 💚';
       confetti();
     } else if (result === 'lose') {
       emoji.textContent = '😢';
       title.textContent = 'ตาชั่งล้ม!';
       title.style.color = 'var(--wrong)';
       tipText.innerHTML = '<b>ลำไส้ไม่ชอบสิ่งเหล่านี้:</b><br>🧃 Detox · ☕ กาแฟเยอะ · 🚽 นั่งนาน<br><br>' +
-        '<b>ลองใหม่! เลือก:</b><br>🥬 กากใย · 💧 น้ำ · 🦠 พรีไบโอติก · 🏃 เคลื่อนไหว';
+        '<b>ลองใหม่! เลือก:</b><br>🥬 กากใย · 💧 น้ำ · 🦠 โพรไบโอติก · 🏃 เคลื่อนไหว';
     } else {
       emoji.textContent = '🤔';
       title.textContent = 'เกือบแล้ว!';
       title.style.color = 'var(--beam-deep)';
       tipText.innerHTML = '<b>สิ่งที่ลำไส้ชอบจริงๆ:</b><br>' +
-        '✅ กากใย · น้ำ · พรีไบโอติก · การเคลื่อนไหว<br><br>' +
+        '✅ กากใย · น้ำ · โพรไบโอติก · การเคลื่อนไหว<br><br>' +
         '<b>สิ่งที่ควรหลีกเลี่ยง:</b><br>' +
         '❌ Detox · กาแฟเยอะ · นั่งห้องน้ำนาน';
     }
