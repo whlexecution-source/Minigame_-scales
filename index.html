@@ -1027,51 +1027,38 @@
     beam.className = 'beam-group';
     
     let leftWrong = 0, rightWrong = 0;
-    let leftCorrect = 0, rightCorrect = 0;
     
     state.slotContents.forEach((item, idx) => {
-      if (!item) return;
-      if (!item.correct) {
-        if (idx < 2) leftWrong++;
-        else rightWrong++;
-      } else {
-        if (idx < 2) leftCorrect++;
-        else rightCorrect++;
-      }
+      if (!item || item.correct) return;
+      if (idx < 2) leftWrong++;
+      else rightWrong++;
     });
     
     const totalWrong = leftWrong + rightWrong;
     
     if (totalWrong === 0) {
-      // No wrongs yet - gentle balance based on count
-      const leftTotal = leftCorrect;
-      const rightTotal = rightCorrect;
-      if (leftTotal > rightTotal) {
-        beam.classList.add('tilt-slight-left');
-      } else if (rightTotal > leftTotal) {
-        beam.classList.add('tilt-slight-right');
-      }
-      // else: balanced, stay flat
-    } else {
-      // Wrong items = heavy! Tilt toward the side with more wrongs
-      beam.classList.add('wobble');
-      setTimeout(() => {
-        beam.className = 'beam-group';
-        if (leftWrong > rightWrong) {
-          beam.classList.add(leftWrong >= 2 ? 'tilt-left' : 'tilt-slight-left');
-        } else if (rightWrong > leftWrong) {
-          beam.classList.add(rightWrong >= 2 ? 'tilt-right' : 'tilt-slight-right');
-        } else {
-          // Equal wrongs - still unbalanced, tilt based on where the wrong was just placed
-          const lastItem = state.placedItems[state.placedItems.length - 1];
-          if (lastItem && !lastItem.correct) {
-            beam.classList.add(lastItem.slotIdx < 2 ? 'tilt-slight-left' : 'tilt-slight-right');
-          } else {
-            beam.classList.add('tilt-slight-right');
-          }
-        }
-      }, 500);
+      // All correct (or nothing placed yet) - stay balanced, no tilt
+      return;
     }
+    
+    // Wrong items = heavy! Tilt toward the side with more wrongs
+    beam.classList.add('wobble');
+    setTimeout(() => {
+      beam.className = 'beam-group';
+      if (leftWrong > rightWrong) {
+        beam.classList.add(leftWrong >= 2 ? 'tilt-left' : 'tilt-slight-left');
+      } else if (rightWrong > leftWrong) {
+        beam.classList.add(rightWrong >= 2 ? 'tilt-right' : 'tilt-slight-right');
+      } else {
+        // Equal wrongs - still unbalanced, tilt based on where the wrong was just placed
+        const lastItem = state.placedItems[state.placedItems.length - 1];
+        if (lastItem && !lastItem.correct) {
+          beam.classList.add(lastItem.slotIdx < 2 ? 'tilt-slight-left' : 'tilt-slight-right');
+        } else {
+          beam.classList.add('tilt-slight-right');
+        }
+      }
+    }, 500);
   }
   
   function revealAnswers() {
