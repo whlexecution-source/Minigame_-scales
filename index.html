@@ -1012,9 +1012,65 @@
     playPlace();
     updateHUD();
     
-    // When 4 placed -> reveal answers
+    // Tilt the scale in real-time based on current placements
+    setTimeout(() => tiltScaleLive(), 300);
+    
+    // When 4 placed -> reveal answers (full reveal with ticks/crosses)
     if (state.placedCount >= 4) {
-      setTimeout(() => revealAnswers(), 500);
+      setTimeout(() => revealAnswers(), 900);
+    }
+  }
+  
+  // Live tilt during gameplay - reacts to wrong items immediately
+  function tiltScaleLive() {
+    const beam = document.getElementById('beam-group');
+    beam.className = 'beam-group';
+    
+    let leftWrong = 0, rightWrong = 0;
+    let leftCorrect = 0, rightCorrect = 0;
+    
+    state.slotContents.forEach((item, idx) => {
+      if (!item) return;
+      if (!item.correct) {
+        if (idx < 2) leftWrong++;
+        else rightWrong++;
+      } else {
+        if (idx < 2) leftCorrect++;
+        else rightCorrect++;
+      }
+    });
+    
+    const totalWrong = leftWrong + rightWrong;
+    
+    if (totalWrong === 0) {
+      // No wrongs yet - gentle balance based on count
+      const leftTotal = leftCorrect;
+      const rightTotal = rightCorrect;
+      if (leftTotal > rightTotal) {
+        beam.classList.add('tilt-slight-left');
+      } else if (rightTotal > leftTotal) {
+        beam.classList.add('tilt-slight-right');
+      }
+      // else: balanced, stay flat
+    } else {
+      // Wrong items = heavy! Tilt toward the side with more wrongs
+      beam.classList.add('wobble');
+      setTimeout(() => {
+        beam.className = 'beam-group';
+        if (leftWrong > rightWrong) {
+          beam.classList.add(leftWrong >= 2 ? 'tilt-left' : 'tilt-slight-left');
+        } else if (rightWrong > leftWrong) {
+          beam.classList.add(rightWrong >= 2 ? 'tilt-right' : 'tilt-slight-right');
+        } else {
+          // Equal wrongs - still unbalanced, tilt based on where the wrong was just placed
+          const lastItem = state.placedItems[state.placedItems.length - 1];
+          if (lastItem && !lastItem.correct) {
+            beam.classList.add(lastItem.slotIdx < 2 ? 'tilt-slight-left' : 'tilt-slight-right');
+          } else {
+            beam.classList.add('tilt-slight-right');
+          }
+        }
+      }, 500);
     }
   }
   
@@ -1025,14 +1081,13 @@
       el.classList.add(isCorrect ? 'reveal-correct' : 'reveal-wrong');
     });
     
-    // 2) Mark ALL choice cards with tick/cross (used ones and unused ones)
+    // 2) Mark ALL choice cards with tick/cross
     setTimeout(() => {
       document.querySelectorAll('.choice-card').forEach(card => {
         const id = card.dataset.id;
         const item = ALL_ITEMS.find(i => i.id === id);
         const mark = card.querySelector('.reveal-mark');
         
-        // Only show marks on cards that were USED (placed on scale)
         if (state.usedIds.has(id)) {
           card.classList.remove('used');
           card.classList.add(item.correct ? 'reveal-correct' : 'reveal-wrong');
@@ -1042,49 +1097,23 @@
       });
     }, 300);
     
-    // 3) Tilt the scale based on placement
-    setTimeout(() => updateScaleBalance(), 600);
+    // 3) Show balance status label (scale is already tilted from live updates)
+    setTimeout(() => showBalanceStatus(), 600);
     
     // 4) Show bottom sheet with summary
     setTimeout(() => showRevealSheet(), 1200);
   }
   
-  function updateScaleBalance() {
-    const beam = document.getElementById('beam-group');
+  function showBalanceStatus() {
     const status = document.getElementById('balance-status');
-    beam.className = 'beam-group';
     status.classList.remove('show', 'unbalanced', 'perfect');
     
-    let wrongCount = 0;
-    let leftWrong = 0, rightWrong = 0;
-    
-    state.slotContents.forEach((item, idx) => {
-      if (!item) return;
-      if (!item.correct) {
-        wrongCount++;
-        if (idx < 2) leftWrong++;
-        else rightWrong++;
-      }
-    });
+    const wrongCount = state.placedItems.filter(i => !i.correct).length;
     
     if (wrongCount === 0) {
-      // All correct - balance!
       status.textContent = '⚖️ สมดุล!';
       status.classList.add('show', 'perfect');
     } else {
-      // Tilt based on wrong items position
-      beam.classList.add('wobble');
-      setTimeout(() => {
-        beam.className = 'beam-group';
-        if (leftWrong > rightWrong) {
-          beam.classList.add(leftWrong >= 2 ? 'tilt-left' : 'tilt-slight-left');
-        } else if (rightWrong > leftWrong) {
-          beam.classList.add(rightWrong >= 2 ? 'tilt-right' : 'tilt-slight-right');
-        } else {
-          // Equal wrongs on both sides — still unbalanced, tilt slightly
-          beam.classList.add('tilt-slight-right');
-        }
-      }, 600);
       status.textContent = '⚠️ ไม่สมดุล';
       status.classList.add('show', 'unbalanced');
     }
