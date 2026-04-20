@@ -210,7 +210,7 @@
   
   .instruction {
     text-align: center;
-    font-size: 13px;
+    font-size: 15px;
     color: var(--text-dark);
     margin: 8px 0 4px;
     opacity: 0.9;
@@ -234,7 +234,7 @@
   }
   
   .box-label {
-    font-size: 13px;
+    font-size: 15px;
     text-align: center;
     color: var(--mint-border);
     margin-bottom: 10px;
@@ -244,14 +244,14 @@
   .choices-grid {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
-    gap: 9px;
+    gap: 11px;
   }
   
   .choice-card {
     background: var(--mint);
-    border: 2.5px solid var(--mint-border);
-    border-radius: 12px;
-    padding: 12px 8px;
+    border: 3px solid var(--mint-border);
+    border-radius: 14px;
+    padding: 12px 10px;
     text-align: center;
     cursor: pointer;
     transition: all 0.15s;
@@ -261,9 +261,9 @@
     flex-direction: row;
     align-items: center;
     justify-content: center;
-    gap: 8px;
+    gap: 10px;
     position: relative;
-    box-shadow: 0 3px 0 var(--mint-border);
+    box-shadow: 0 4px 0 var(--mint-border);
   }
   
   .choice-card:active {
@@ -329,14 +329,14 @@
   }
   
   .choice-icon {
-    font-size: 32px;
+    font-size: 34px;
     line-height: 1;
     flex-shrink: 0;
   }
   
   .choice-text {
-    font-size: 14px;
-    font-weight: 600;
+    font-size: 22px;
+    font-weight: 700;
     color: var(--text-navy);
     line-height: 1.2;
     text-align: left;
@@ -350,16 +350,16 @@
     justify-content: flex-end;
     align-items: center;
     position: relative;
-    min-height: 180px;
+    min-height: 220px;
     padding: 8px 0 0;
   }
   
   .scale-wrap {
     position: relative;
     width: 100%;
-    max-width: 400px;
+    max-width: 420px;
     height: 100%;
-    max-height: 240px;
+    max-height: 280px;
     display: flex;
     justify-content: center;
     align-items: flex-end;
@@ -383,12 +383,12 @@
   
   .beam-group {
     position: absolute;
-    bottom: 45px;
+    bottom: 60px;
     left: 50%;
     transform: translateX(-50%) rotate(0deg);
-    width: 340px;
-    max-width: 92%;
-    height: 70px;
+    width: 380px;
+    max-width: 96%;
+    height: 90px;
     transform-origin: center bottom;
     transition: transform 0.8s cubic-bezier(0.68, -0.3, 0.3, 1.4);
   }
@@ -423,12 +423,12 @@
     width: 100%;
     display: flex;
     justify-content: space-around;
-    padding: 0 18px;
+    padding: 0 12px;
   }
   
   .drop-slot {
-    width: 54px;
-    height: 26px;
+    width: 72px;
+    height: 30px;
     background: var(--mint);
     border: 2.5px solid var(--mint-border);
     border-bottom: none;
@@ -454,26 +454,26 @@
     left: 50%;
     transform: translateX(-50%);
     background: white;
-    border: 2px solid var(--mint-border);
-    border-radius: 8px;
-    padding: 4px 3px;
-    width: 58px;
+    border: 2.5px solid var(--mint-border);
+    border-radius: 10px;
+    padding: 6px 4px;
+    width: 82px;
     text-align: center;
-    font-size: 9px;
-    font-weight: 500;
+    font-size: 12px;
+    font-weight: 600;
     color: var(--text-navy);
     animation: drop-in 0.5s cubic-bezier(0.5, -0.3, 0.3, 1.4);
-    box-shadow: 0 -2px 4px rgba(0,0,0,0.08);
-    line-height: 1.15;
+    box-shadow: 0 -2px 6px rgba(0,0,0,0.12);
+    line-height: 1.2;
     z-index: 2;
-    margin-bottom: 2px;
+    margin-bottom: 3px;
   }
   
   .slot-item .item-icon {
-    font-size: 16px;
+    font-size: 22px;
     display: block;
     line-height: 1;
-    margin-bottom: 1px;
+    margin-bottom: 2px;
   }
   
   .slot-item.reveal-correct {
@@ -711,40 +711,55 @@
     100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
   }
   
-  /* Small screens */
-  @media (max-height: 780px) {
-    .choice-card { min-height: 62px; padding: 10px 6px; }
+  /* Small screens - keep text BIG for seniors, shrink scale instead */
+  @media (max-height: 800px) {
+    .choice-card { min-height: 66px; padding: 10px 8px; }
+    .choice-icon { font-size: 30px; }
+    .choice-text { font-size: 20px; }
+    .scale-wrap { max-height: 220px; }
+  }
+  
+  @media (max-height: 720px) {
+    .choice-card { min-height: 62px; padding: 10px 8px; gap: 8px; }
     .choice-icon { font-size: 28px; }
-    .choice-text { font-size: 13px; }
-  }
-  
-  @media (max-height: 700px) {
-    .choice-card { min-height: 56px; padding: 8px 6px; }
-    .choice-icon { font-size: 24px; }
-    .choice-text { font-size: 12px; }
-    .beam-group { height: 64px; }
-    .drop-slot { width: 48px; height: 24px; }
-    .slot-item { width: 52px; font-size: 8.5px; }
-    .slot-item .item-icon { font-size: 14px; }
+    .choice-text { font-size: 19px; }
+    .beam-group { height: 82px; }
+    .drop-slot { width: 64px; height: 28px; }
+    .slot-item { width: 74px; font-size: 11px; padding: 5px 3px; }
+    .slot-item .item-icon { font-size: 20px; }
     .scale-wrap { max-height: 200px; }
+    .scale-section { min-height: 180px; }
   }
   
-  @media (max-height: 620px) {
+  @media (max-height: 650px) {
     .title { font-size: 22px; }
     .title .accent { font-size: 26px; }
     .subtitle { font-size: 13px; margin-bottom: 16px; }
-    .choice-card { min-height: 50px; }
-    .choice-icon { font-size: 22px; }
-    .choice-text { font-size: 11.5px; }
+    .choice-card { min-height: 58px; padding: 8px 8px; }
+    .choice-icon { font-size: 26px; }
+    .choice-text { font-size: 18px; }
     .scale-wrap { max-height: 180px; }
+    .scale-section { min-height: 160px; }
+    .drop-slot { width: 56px; }
+    .slot-item { width: 66px; font-size: 10px; }
+    .slot-item .item-icon { font-size: 18px; }
     .scale-stand { border-left-width: 44px; border-right-width: 44px; border-bottom-width: 60px; }
   }
   
-  @media (max-width: 360px) {
-    .choice-text { font-size: 12px; }
-    .choice-icon { font-size: 24px; }
-    .drop-slot { width: 44px; }
-    .slot-item { width: 48px; font-size: 8px; }
+  @media (max-width: 380px) {
+    .choice-text { font-size: 18px; }
+    .choice-icon { font-size: 28px; }
+    .choice-card { gap: 7px; padding: 10px 6px; }
+    .drop-slot { width: 60px; }
+    .slot-item { width: 68px; font-size: 10.5px; }
+    .slot-item .item-icon { font-size: 18px; }
+  }
+  
+  @media (max-width: 340px) {
+    .choice-text { font-size: 16px; }
+    .drop-slot { width: 52px; }
+    .slot-item { width: 60px; font-size: 9.5px; }
+    .slot-item .item-icon { font-size: 16px; }
   }
 </style>
 </head>
