@@ -796,9 +796,9 @@
   
   <div class="how-to">
     <h3>🎯 วิธีเล่น</h3>
-    <p>1) แตะเลือกตัวเลือก (มี 7 อย่าง)<br>
-    2) แตะช่องบนตาชั่งเพื่อวาง<br>
-    3) เลือกครบ 4 อันแล้ว ดูเฉลย<br>
+    <p>1) แตะเลือกตัวเลือก → ขึ้นตาชั่งทันที<br>
+    2) เปลี่ยนใจ? แตะของบนตาชั่งเพื่อเอาออก<br>
+    3) เลือกครบ 4 อัน ระบบจะเฉลย<br>
     4) ถ้าเลือก<strong style="color:var(--correct)">ถูกทั้งหมด</strong> = ตาชั่งสมดุล ⚖️</p>
   </div>
 </div>
@@ -812,7 +812,7 @@
     </div>
   </div>
   
-  <p class="instruction">แตะเลือก <strong>→</strong> แตะช่องบนตาชั่ง</p>
+  <p class="instruction">แตะเลือก → ขึ้นตาชั่งอัตโนมัติ <strong>(แตะที่ตาชั่งเพื่อเอาออก)</strong></p>
   
   <div class="choices-container">
     <div class="box-label">🤔 ลำไส้เราชอบอะไรนะ?</div>
@@ -884,7 +884,8 @@
     selectedChoice: null,
     usedIds: new Set(),
     slotContents: [null, null, null, null],
-    placedItems: [] // in order of placement
+    placedItems: [], // in order of placement
+    revealed: false
   };
   
   function showScreen(id) {
@@ -898,7 +899,8 @@
       selectedChoice: null,
       usedIds: new Set(),
       slotContents: [null, null, null, null],
-      placedItems: []
+      placedItems: [],
+      revealed: false
     };
     renderChoices();
     clearSlots();
@@ -937,16 +939,16 @@
   function selectChoice(item, card) {
     if (state.usedIds.has(item.id)) return;
     
-    document.querySelectorAll('.choice-card').forEach(c => c.classList.remove('selected'));
-    
-    if (state.selectedChoice && state.selectedChoice.id === item.id) {
-      state.selectedChoice = null;
-      clearSlotHints();
-    } else {
-      state.selectedChoice = item;
-      card.classList.add('selected');
-      showSlotHints();
+    // Find first empty slot
+    const emptySlotIdx = state.slotContents.findIndex(s => s === null);
+    if (emptySlotIdx === -1) {
+      // All slots full - shouldn't normally happen since card gets "used" state
+      return;
     }
+    
+    const slot = document.querySelector(`.drop-slot[data-slot="${emptySlotIdx}"]`);
+    state.selectedChoice = item;
+    placeInSlot(slot, emptySlotIdx);
   }
   
   function showSlotHints() {
@@ -974,14 +976,44 @@
     document.getElementById('balance-status').classList.remove('show', 'unbalanced', 'perfect');
   }
   
+  // Click slot to REMOVE the item from it (during gameplay only, not after reveal)
   document.querySelectorAll('.drop-slot').forEach(slot => {
     slot.addEventListener('click', () => {
-      if (!state.selectedChoice) return;
+      if (state.revealed) return; // can't remove after reveal
       const slotIdx = parseInt(slot.dataset.slot);
-      if (state.slotContents[slotIdx]) return;
-      placeInSlot(slot, slotIdx);
+      if (state.slotContents[slotIdx]) {
+        removeFromSlot(slot, slotIdx);
+      }
     });
   });
+  
+  function removeFromSlot(slot, slotIdx) {
+    const item = state.slotContents[slotIdx];
+    if (!item) return;
+    
+    // Clear slot
+    slot.innerHTML = '';
+    state.slotContents[slotIdx] = null;
+    
+    // Remove from placedItems array
+    const pIdx = state.placedItems.findIndex(p => p.slotIdx === slotIdx);
+    if (pIdx !== -1) state.placedItems.splice(pIdx, 1);
+    
+    // Re-enable the choice card
+    state.usedIds.delete(item.id);
+    state.placedCount--;
+    
+    const card = document.querySelector(`.choice-card[data-id="${item.id}"]`);
+    if (card) {
+      card.classList.remove('used');
+    }
+    
+    playPop();
+    updateHUD();
+    
+    // Re-evaluate scale tilt
+    setTimeout(() => tiltScaleLive(), 200);
+  }
   
   function placeInSlot(slot, slotIdx) {
     const item = state.selectedChoice;
@@ -1004,10 +1036,8 @@
     
     const card = document.querySelector(`.choice-card[data-id="${item.id}"]`);
     if (card) {
-      card.classList.remove('selected');
       card.classList.add('used');
     }
-    clearSlotHints();
     
     playPlace();
     updateHUD();
@@ -1062,6 +1092,8 @@
   }
   
   function revealAnswers() {
+    state.revealed = true;
+    
     // 1) Mark each placed item on the scale with correct/wrong color
     document.querySelectorAll('.slot-item').forEach(el => {
       const isCorrect = el.dataset.correct === 'true';
@@ -1171,6 +1203,20 @@
       g.gain.setValueAtTime(0.08, ctx.currentTime);
       g.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.15);
       o.start(); o.stop(ctx.currentTime + 0.15);
+    } catch(e) {}
+  }
+  
+  function playPop() {
+    try {
+      const ctx = new (window.AudioContext || window.webkitAudioContext)();
+      const o = ctx.createOscillator();
+      const g = ctx.createGain();
+      o.connect(g); g.connect(ctx.destination);
+      o.frequency.setValueAtTime(660, ctx.currentTime);
+      o.frequency.exponentialRampToValueAtTime(330, ctx.currentTime + 0.1);
+      g.gain.setValueAtTime(0.06, ctx.currentTime);
+      g.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.12);
+      o.start(); o.stop(ctx.currentTime + 0.12);
     } catch(e) {}
   }
   
